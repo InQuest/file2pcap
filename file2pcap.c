@@ -45,8 +45,9 @@ struct
 
 FILE *inFile, *outFile;
 
-const int packetLen4 = (sizeof(SRC_ETHER) - 1 + sizeof(DST_ETHER) - 1 + sizeof(PROTO_ETHER) - 1 + sizeof(struct ip) + sizeof(struct tcphdr));
-const int packetLen6 = (sizeof(SRC_ETHER) - 1 + sizeof(DST_ETHER) - 1 + sizeof(PROTO_ETHER6) - 1 + sizeof(struct ip6_hdr) + sizeof(struct tcphdr));
+size_t packetLen4 = (sizeof(SRC_ETHER) - 1 + sizeof(DST_ETHER) - 1 + sizeof(PROTO_ETHER) - 1 + sizeof(struct ip) + sizeof(struct tcphdr));
+size_t packetLen6 = (sizeof(SRC_ETHER) - 1 + sizeof(DST_ETHER) - 1 + sizeof(PROTO_ETHER6) - 1 + sizeof(struct ip6_hdr) + sizeof(struct tcphdr));
+size_t etherLen = (sizeof(SRC_ETHER) - 1 + sizeof(DST_ETHER) - 1 + sizeof(PROTO_ETHER) - 1);
 
 struct handover hoFtp;
 
@@ -58,6 +59,7 @@ void usage()
 					 "Version: " VERSION "\n"
 					 "Takes a file as input and creates a pcap showing that file being transferred between hosts\n"
 					 "\nOptions:\n"
+                     "-v vlan\t\t - vlan number\n"
 					 "-e encoding\t\t0 - base64\n"
 					 "\t\t\t1 - quoted printable\n"
 					 "\t\t\t2 - UU encoding\n"
@@ -431,9 +433,9 @@ int tcpSendString(struct handover *ho, char *string, char direction)
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if (direction == TO_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther) - 1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther) - 1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 	craftTcp(string, strlen(string), direction, TH_ACK | TH_PUSH, ho);
 
@@ -444,9 +446,9 @@ int tcpSendString(struct handover *ho, char *string, char direction)
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if (direction == TO_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther) - 1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther) - 1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 
 	craftTcp(NULL, 0, direction2, TH_ACK, ho);
 
@@ -480,7 +482,7 @@ int tcpHandshake(struct handover *ho)
 
 	//replace that with a sprintf and a single write
 
-	write(fileno(outFile), ho->toEther, sizeof(ho->toEther) - 1);
+	write(fileno(outFile), ho->toEther, etherLen);
 
 	craftTcp(NULL, 0, TO_SERVER, TH_SYN, ho); //direction 0 - client to server
 
@@ -491,7 +493,7 @@ int tcpHandshake(struct handover *ho)
 	//and now send the SYN/ACK
 	ph.usec += INTERVAL;
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->fromEther, sizeof(ho->fromEther) - 1);
+	write(fileno(outFile), ho->fromEther, etherLen);
 	craftTcp(NULL, 0, FROM_SERVER, TH_SYN | TH_ACK, ho); //direction 1 - server to client
 
 	ho->ack_seq += 1;
@@ -499,7 +501,7 @@ int tcpHandshake(struct handover *ho)
 	//client to server ACK
 	ph.usec += INTERVAL;
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->toEther, sizeof(ho->toEther) - 1);
+	write(fileno(outFile), ho->toEther, etherLen);
 	craftTcp(NULL, 0, TO_SERVER, TH_ACK, ho); //direction 0 - client to server
 
 	ho->time = ph.time;
@@ -528,7 +530,7 @@ int tcpShutdown(struct handover *ho)
 
 	//server to client FIN
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->fromEther, sizeof(ho->fromEther) - 1);
+	write(fileno(outFile), ho->fromEther, etherLen);
 	craftTcp(NULL, 0, FROM_SERVER, TH_ACK | TH_FIN, ho); //direction - server to client
 
 	ho->ack_seq += 1;
@@ -536,14 +538,14 @@ int tcpShutdown(struct handover *ho)
 	//and now send the ack
 	ph.usec += INTERVAL;
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->toEther, sizeof(ho->toEther) - 1);
+	write(fileno(outFile), ho->toEther, etherLen);
 
 	craftTcp(NULL, 0, TO_SERVER, TH_ACK, ho); //direction - client to server
 
 	//client to server FIN
 	ph.usec += INTERVAL;
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->toEther, sizeof(ho->toEther) - 1);
+	write(fileno(outFile), ho->toEther, etherLen);
 	craftTcp(NULL, 0, TO_SERVER, TH_ACK | TH_FIN, ho); //direction - client to server
 
 	ho->seq += 1;
@@ -551,7 +553,7 @@ int tcpShutdown(struct handover *ho)
 	//and now send the ack
 	ph.usec += INTERVAL;
 	write(fileno(outFile), &ph, sizeof(struct pcap_packet_header));
-	write(fileno(outFile), ho->fromEther, sizeof(ho->fromEther) - 1);
+	write(fileno(outFile), ho->fromEther, etherLen);
 	craftTcp(NULL, 0, FROM_SERVER, TH_ACK, ho); //direction - server to client
 
 	//	printf("Pcap replay length: %d second(s)\n", ph.time - 0x48f35358 + 1);
@@ -799,6 +801,7 @@ int main(int argc, char **argv)
 	int c, i;
 	struct stat statbuf, statbuf2;
 	struct handover ho;
+    uint16_t vlan = 0;
 
 	if (argc < 2)
 		usage();
@@ -807,10 +810,23 @@ int main(int argc, char **argv)
 	ho.ipV = 4;
 	hoFtp.ipV = 4;
 
-	while ((c = getopt(argc, argv, "e:m:o:p:6")) != -1)
+	while ((c = getopt(argc, argv, "v:e:m:o:p:6")) != -1)
 	{
 		switch (c)
 		{
+        case 'v':
+            vlan = (uint16_t)atoi(optarg);
+            if (vlan == 0 || vlan > 4095) /* yes, I know, priority tagging... */
+            {
+                fprintf(stderr, "vlan must be between 1 and 4095\n");
+                exit(1);
+            }
+            vlan = htons(0xfff & vlan);
+            packetLen4 += 4;
+            packetLen6 += 4;
+            etherLen += 4;
+            break;
+
 		case 'e':
 			encoderString = (char *)strdup(optarg);
 			break;
@@ -941,11 +957,23 @@ printf("POSITIVE! - #%s#\n", test);
 
 	memcpy(ho.toEther, ho.srcEther, 6);
 	memcpy(ho.toEther + 6, ho.dstEther, 6);
-	memcpy(ho.toEther + 12, ho.protoEther, 2);
+    if (vlan)
+    {
+        memcpy(ho.toEther + 12, PROTO_8021Q, 2);
+        memcpy(ho.toEther + 14, &vlan, 2);
+        memcpy(ho.toEther + 16, ho.protoEther, 2);
+    } else
+	    memcpy(ho.toEther + 12, ho.protoEther, 2);
 
 	memcpy(ho.fromEther, ho.dstEther, 6);
 	memcpy(ho.fromEther + 6, ho.srcEther, 6);
-	memcpy(ho.fromEther + 12, ho.protoEther, 2);
+    if (vlan)
+    {
+        memcpy(ho.fromEther + 12, PROTO_8021Q, 2);
+        memcpy(ho.fromEther + 14, &vlan, 2);
+        memcpy(ho.fromEther + 16, ho.protoEther, 2);
+    } else
+	    memcpy(ho.fromEther + 12, ho.protoEther, 2);
 
 	if (portString != NULL)
 	{
@@ -1015,6 +1043,12 @@ printf("POSITIVE! - #%s#\n", test);
 			switch (modeString[i])
 			{
 			case 'f':
+                if (vlan)
+                {
+                    fprintf(stderr, "VLAN is not supported with FTP mode\n");
+                    exit(1);
+                }
+
 				if (ho.dstPort == 0)
 					ho.dstPort = 21;
 
@@ -1026,6 +1060,11 @@ printf("POSITIVE! - #%s#\n", test);
 				break;
 
 			case 'F':
+                if (vlan)
+                {
+                    fprintf(stderr, "VLAN is not supported with FTP mode\n");
+                    exit(1);
+                }
 
 				if (ho.dstPort == 0)
 					ho.dstPort = 21;

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
 
@@ -12,7 +13,7 @@
 #define DST_ETHER 	"\x00\x55\x44\x33\x22\x11"
 #define PROTO_ETHER 	"\x08\x00"
 #define PROTO_ETHER6	"\x86\xDD"
-
+#define PROTO_8021Q     "\x81\x00"
 #define SRC_IP4		"192.168.0.1"
 #define DST_IP4		"173.37.145.84"
 
@@ -30,6 +31,7 @@
 #define ACTIVE_FTP		0
 #define PASSIVE_FTP		1
 
+extern size_t etherLen;
 
 struct handover {
 	unsigned int srcIP;
@@ -44,8 +46,8 @@ struct handover {
 	char protoEther[2];
 	char srcFile[200];
 	char dstFile[200];
-	char toEther[15];
-	char fromEther[15];
+	char toEther[20];
+	char fromEther[20];
 	FILE *inFile;
 	FILE *outFile;
 	char encoder;

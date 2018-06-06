@@ -180,9 +180,9 @@ int httpTransferFile(struct handover *ho) {
                 write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 		if(ho->direction == FROM_SERVER)
-	                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+	                write(fileno(ho->outFile), ho->fromEther, etherLen);
 		else
-			write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+			write(fileno(ho->outFile), ho->toEther, etherLen);
 		
 
 
@@ -195,9 +195,9 @@ int httpTransferFile(struct handover *ho) {
                 write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 		if(ho->direction == FROM_SERVER)
-	                write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+	                write(fileno(ho->outFile), ho->toEther, etherLen);
 		else
-	                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+	                write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 
