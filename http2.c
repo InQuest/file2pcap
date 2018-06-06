@@ -101,9 +101,9 @@ int http2ClientMagic(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 	craftTcp(http2Magic, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -115,9 +115,9 @@ int http2ClientMagic(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    
@@ -164,9 +164,9 @@ int http2ClientSettings(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 	craftTcp(http2Settings, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -178,9 +178,9 @@ int http2ClientSettings(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    
@@ -251,9 +251,9 @@ int http2ClientGetRequest(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 	craftTcp(request, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -265,9 +265,9 @@ int http2ClientGetRequest(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    
@@ -354,9 +354,9 @@ int http2MagicGetRequest(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 
 	craftTcp(request, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
@@ -369,9 +369,9 @@ int http2MagicGetRequest(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    //direction - client to server
@@ -419,9 +419,9 @@ int http2SettingsAck(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 	craftTcp(settingsAck, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -433,9 +433,9 @@ int http2SettingsAck(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    
@@ -482,9 +482,9 @@ int http2Settings(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	
 
 	craftTcp(settings, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
@@ -497,9 +497,9 @@ int http2Settings(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    //direction - client to server
@@ -566,9 +566,9 @@ int http2Headers(struct handover *ho) {
         write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
         if(ho->direction == FROM_SERVER)
-                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+                write(fileno(ho->outFile), ho->fromEther, etherLen);
         else
-                write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+                write(fileno(ho->outFile), ho->toEther, etherLen);
 
 	craftTcp(request, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -580,9 +580,9 @@ int http2Headers(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    //direction - client to server
@@ -662,9 +662,9 @@ int http2TransferFile(struct handover *ho) {
                 write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 		if(ho->direction == FROM_SERVER)
-	                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+	                write(fileno(ho->outFile), ho->fromEther, etherLen);
 		else
-			write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+			write(fileno(ho->outFile), ho->toEther, etherLen);
 		
 
 
@@ -677,9 +677,9 @@ int http2TransferFile(struct handover *ho) {
                 write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 		if(ho->direction == FROM_SERVER)
-	                write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+	                write(fileno(ho->outFile), ho->toEther, etherLen);
 		else
-	                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+	                write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 
@@ -729,9 +729,9 @@ int http2DataStreamClose(struct handover *ho) {
         write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
         if(ho->direction == FROM_SERVER)
-                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+                write(fileno(ho->outFile), ho->fromEther, etherLen);
         else
-                write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+                write(fileno(ho->outFile), ho->toEther, etherLen);
 
 	craftTcp(dataClose, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -743,9 +743,9 @@ int http2DataStreamClose(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    //direction - client to server
@@ -793,9 +793,9 @@ int http2GoAway(struct handover *ho) {
         write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
         if(ho->direction == FROM_SERVER)
-                write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+                write(fileno(ho->outFile), ho->fromEther, etherLen);
         else
-                write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+                write(fileno(ho->outFile), ho->toEther, etherLen);
 
 	craftTcp(goAway, len, ho->direction == FROM_SERVER ? FROM_SERVER : TO_SERVER, TH_ACK|TH_PUSH, ho);
 
@@ -807,9 +807,9 @@ int http2GoAway(struct handover *ho) {
 	write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
 
 	if(ho->direction == FROM_SERVER)
-		write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+		write(fileno(ho->outFile), ho->toEther, etherLen);
 	else
-		write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		write(fileno(ho->outFile), ho->fromEther, etherLen);
 
 
 	craftTcp(NULL,0, ho->direction == FROM_SERVER ? TO_SERVER : FROM_SERVER, TH_ACK, ho);    //direction - client to server

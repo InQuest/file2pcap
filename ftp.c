@@ -193,9 +193,9 @@ int ftpTransferFile(struct handover *ho) {
                 write(fileno(ho->outFile), &ph, sizeof(struct pcap_packet_header));
                 
 		if(ho->direction == TO_SERVER)
-			write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+			write(fileno(ho->outFile), ho->toEther, etherLen);
 		else
-			write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+			write(fileno(ho->outFile), ho->fromEther, etherLen);
 			
 
 
@@ -209,13 +209,13 @@ int ftpTransferFile(struct handover *ho) {
 
 		if(ho->direction == TO_SERVER)
 	        {
-		        write(fileno(ho->outFile), ho->fromEther, sizeof(ho->fromEther)-1);
+		        write(fileno(ho->outFile), ho->fromEther, etherLen);
 			craftTcp(NULL,0, FROM_SERVER, TH_ACK, ho);   
 	
 		}
 		else
 		{
-			write(fileno(ho->outFile), ho->toEther, sizeof(ho->toEther)-1);
+			write(fileno(ho->outFile), ho->toEther, etherLen);
 			craftTcp(NULL,0, TO_SERVER, TH_ACK, ho);   
 		}
 		
