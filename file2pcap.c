@@ -752,6 +752,8 @@ int httpPost(struct handover *ho)
 	httpPostRequest(ho);
 	httpTransferFile(ho);
 	httpPostFinalBoundary(ho);
+    ho->direction = FROM_SERVER;
+	httpPostRequestAcknowledge(ho);
 	tcpShutdown(ho);
 
 	return 0;
