@@ -90,6 +90,28 @@ int httpPostRequest(struct handover *ho) {
 return(0);
 }
 
+int httpPostRequestAcknowledge(struct handover *ho) {
+        char http_header[] =    "HTTP/1.1 200 Ok\r\n"
+                                "Date: Wed, 29 Jul 2009 13:35:26 GMT\r\n"
+                                "Server: Apache/2.2.3 (Debian) PHP/5.2.0-8+etch10 mod_ssl/2.2.3 OpenSSL/0.9.8c\r\n"
+                                "Last-Modified: Sun, 20 Jan 2008 12:01:21 GMT\r\n"
+                                "ETag: \"a801c-1bbd1c-22416640\"\r\n"
+                                "Accept-Ranges: bytes\r\n"
+                                "Content-Length: ";
+        char http_header_2[] =  "\r\n"
+                                "Keep-Alive: timeout=15, max=99\r\n"
+                                "Connection: Keep-Alive\r\n"
+                                "Content-Type: application/octet-stream\r\n\r\n";
+        char headerBuffer[500];
+
+        snprintf(headerBuffer,sizeof(headerBuffer)-1,"%s%d%s", http_header, 0, http_header_2);
+
+	//this line replaces all the old code below. And it also gets the ethernet addresses right, unlike before
+	tcpSendString(ho, headerBuffer, FROM_SERVER);
+
+return(0);
+}
+
 
 /**************************************************************************************************/
 
