@@ -59,7 +59,15 @@ void usage()
 					 "Version: " VERSION "\n"
 					 "Takes a file as input and creates a pcap showing that file being transferred between hosts\n"
 					 "\nOptions:\n"
-                     "-v vlan\t\t - vlan number\n"
+					"-a [SRC IP:DST IP]\tspecify source and/or dest ip\n"
+					"\t\t\t? - random ipv4 address\n"
+					"\t\t\t-a 192.168.45.72: will simulate a connection with 192.168.45.72 as the src ip\n"\
+					"\t\t\tand the default dst ip\n"
+					"\t\t\t-a :192.168.100.192 will simulate a connection with the default src ip\n"\
+					"\t\t\tand 192.168.100.192 as the dst ip\n"
+					"\t\t\t-a ?:? will simulate a connection with a random src ip and random dst ip\n"
+					"\t\t\t[default: 192.168.0.1:173.37.145.84]\n\n"\
+                     "-v vlan\t\t\tvlan_number\r\n\n"
 					 "-e encoding\t\t0 - base64\n"
 					 "\t\t\t1 - quoted printable\n"
 					 "\t\t\t2 - UU encoding\n"
@@ -799,7 +807,7 @@ int imap(struct handover *ho)
 
 int main(int argc, char **argv)
 {
-	char *modeString = NULL, *srcFile = NULL, *dstFile = NULL, *portString = NULL, *tok1 = NULL, *tok2 = NULL, *encoderString = NULL;
+	char *addressString = NULL, *modeString = NULL, *srcFile = NULL, *dstFile = NULL, *portString = NULL, *tok1 = NULL, *tok2 = NULL, *encoderString = NULL;
 	int c, i;
 	struct stat statbuf, statbuf2;
 	struct handover ho;
@@ -812,10 +820,14 @@ int main(int argc, char **argv)
 	ho.ipV = 4;
 	hoFtp.ipV = 4;
 
-	while ((c = getopt(argc, argv, "v:e:m:o:p:6")) != -1)
+	while ((c = getopt(argc, argv, "a:v:e:m:o:p:6")) != -1)
 	{
 		switch (c)
 		{
+		case 'a':
+			addressString = (char*) strdup(optarg);
+			break;
+
         case 'v':
             vlan = (uint16_t)atoi(optarg);
             if (vlan == 0 || vlan > 4095) /* yes, I know, priority tagging... */
@@ -833,10 +845,6 @@ int main(int argc, char **argv)
 			encoderString = (char *)strdup(optarg);
 			break;
 
-			/*			case 'f':
-				encoderString = (char*) strdup(optarg);
-				break;
-*/
 		case 'm':
 			modeString = (char *)strdup(optarg);
 			break;
@@ -853,13 +861,7 @@ int main(int argc, char **argv)
 			ho.ipV = 6;
 			hoFtp.ipV = 6;
 			break;
-			/*
-			case 'v':
-				test = (char*)strdup(optarg);
-				if(test != NULL)
-printf("POSITIVE! - #%s#\n", test);
-				break;
-*/
+
 		default:
 			usage();
 			exit(0);
@@ -923,8 +925,44 @@ printf("POSITIVE! - #%s#\n", test);
 	ho.usec = ph.usec;
 
 	//fill all the parameters into the handover struct
-	ho.srcIP = inet_addr(random_ipv4(0));
-	ho.dstIP = inet_addr(random_ipv4(1));
+	if(addressString != NULL)
+	{
+		tok1 = strtok(addressString, ":");	
+		if(tok1 != NULL){
+			if(tok1[0] == '?'){
+				ho.srcIP = inet_addr(random_ipv4(0));
+			}
+			else{
+				ho.srcIP = inet_addr(tok1);
+			}
+		}
+		else if(tok1 == NULL){
+			ho.srcIP = inet_addr(SRC_IP4);
+		}
+
+		tok2 = strtok(NULL, ":");
+		
+		if(tok2 != NULL){
+			if(tok2[0] == '?'){
+				ho.dstIP = inet_addr(random_ipv4(1));
+			}
+			else{
+				ho.dstIP = inet_addr(tok2);
+			}
+		}
+		else if(tok2 == NULL){
+			ho.dstIP = inet_addr(DST_IP4);
+		}
+
+		tok1 = NULL;
+		tok2 = NULL;
+	}
+
+	if(addressString == NULL){
+		ho.srcIP = inet_addr(random_ipv4(0));
+		ho.dstIP = inet_addr(random_ipv4(1));
+	}
+	
 	inet_pton(AF_INET6, SRC_IP6, &(ho.srcIP6));
 	inet_pton(AF_INET6, DST_IP6, &(ho.dstIP6));
 	memcpy(ho.srcEther, SRC_ETHER, sizeof(ho.srcEther));
