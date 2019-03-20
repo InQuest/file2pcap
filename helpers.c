@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 #define  __FAVOR_BSD
 #include <netinet/in_systm.h>
@@ -137,6 +138,9 @@ return encoded_data;
 char *badJoke() {
         char *joke = NULL;
         int i, bufferSize=1000, jokeArraySize=1;
+        time_t t = time(NULL);
+        struct tm *tm = localtime(&t);
+        char* timestamp = asctime(tm);
 
 	jokeArraySize =  sizeof(jokeArray) / sizeof(jokeArray[0]);
 
@@ -146,6 +150,7 @@ char *badJoke() {
         i = rand() % jokeArraySize;
 
         snprintf(joke, bufferSize-1,"%s\r\n\r\n",jokeArray[i]);
+        strcat(joke, timestamp);
 
 return joke;
 }
